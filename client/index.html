@@ -2,8 +2,37 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Node</title>
+<title>Chat</title>
+<script src="socket.io/socket.io.js"></script>
+<script type="text/javascript">
+function func() {
+  var x = document.getElementById('num').value;
+  numx = parseInt(x);
+  numx = numx + 1;
+  document.getElementById('answer').innerHTML = numx;
+}
+</script>
 </head>
 <body>
+<h1>Chatroom</h1>
+<form action="" method="post">
+<p><input type="text" id="num" size="40">
+<input type="button" value="send" onClick="func()"></p>
+
+<div class="massage">
+massage
+</div>
+<div id="answer"></div>
+<script type="text/javascript">
+	
+	
+	
+	var socket = io.connect();
+	socket.on("from_server", function(data, fn){
+			var answer = console.log(data.value);
+			fn(answer);
+        });
+	
+</script>
 </body>
 </html>
