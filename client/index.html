@@ -5,34 +5,55 @@
 <title>Chat</title>
 <script src="socket.io/socket.io.js"></script>
 <script type="text/javascript">
-function func() {
-  var x = document.getElementById('num').value;
-  numx = parseInt(x);
-  numx = numx + 1;
-  document.getElementById('answer').innerHTML = numx;
-}
 </script>
 </head>
 <body>
 <h1>Chatroom</h1>
-<form action="" method="post">
-<p><input type="text" id="num" size="40">
-<input type="button" value="send" onClick="func()"></p>
 
-<div class="massage">
-massage
-</div>
-<div id="answer"></div>
+<form name="fm" action="" method="post">
+ID<input type="text" id="txtbox1" name="ttb1" size="43">
+<p>本文<input type="text" id="txtbox2" name="ttb2" size="40">
+<input type="button" value="send" onClick="publishMessage();"></p>
+<div id="msg"></div>
+
 <script type="text/javascript">
 	
-	
-	
 	var socket = io.connect();
+	
+	socket.on("txtsend", function (data) { addMessage(data.value); });
+	
 	socket.on("from_server", function(data, fn){
 			var answer = console.log(data.value);
 			fn(answer);
         });
 	
+	function publishMessage() {
+	  var idInput = document.getElementById('txtbox1');
+      var textInput = document.getElementById('txtbox2');
+      var msg = idInput.value + " : " + textInput.value;
+      socket.emit("txtsend", {value: msg});
+      textInput.value = '';
+    }
+	
+	var msgArea = document.getElementById("msg");
+	function addMessage (msg) {
+      var domMeg = document.createElement('div');
+      domMeg.innerHTML = new Date().toLocaleTimeString() + ' ' + msg;
+      msgArea.appendChild(domMeg);
+    }
+	
+	/*
+	var cnt = 0;
+	function func() {
+		if(cnt < 10){
+			var lg = document.getElementById("log" + cnt);
+			lg.textContent = document.fm.ttb1.value + "：" + document.fm.ttb2.value;
+			cnt++;
+		}else{
+			var lg = document.getElementById("log" + cnt);
+			lg.textContent = "これ以上送信することはできません";
+		}
+	}*/
 </script>
 </body>
 </html>

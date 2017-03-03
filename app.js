@@ -23,9 +23,15 @@ server.listen(port,function(){
 
 const socketio = require("socket.io");
 const io = socketio.listen(server);
+var cot = 0;
 
 io.sockets.on('connection', function(socket) {
   socket.emit("from_server", {value: 'hello'}, function (data) {
-    console.log("hey");
+    console.log("hey" + cot);
+	cot++;
+  });
+  
+  socket.on("txtsend", function (data) {
+    io.sockets.emit("txtsend", {value:data.value});
   });
 });
