@@ -5,43 +5,77 @@
 <title>Chat</title>
 <script src="socket.io/socket.io.js"></script>
 <script type="text/javascript">
+
 </script>
 </head>
 <body>
 <h1>Chatroom</h1>
 
 <form name="fm" action="" method="post">
-ID<input type="text" id="txtbox1" name="ttb1" size="43">
+<div id="userCnt"></div>
+ID<input type="text" id="txtbox1" name="ttb1" size="43" disabled="disabled">
 <p>本文<input type="text" id="txtbox2" name="ttb2" size="40">
-<input type="button" value="send" onClick="publishMessage();"></p>
+<input type="button" value="send" onClick="pbm();"></p>
 <div id="msg"></div>
 
 <script type="text/javascript">
+
+	//ID生成
+	var l = 8;
+	var c = "abcdefghijklmnopqrstuvwxyz0123456789";
+	var cl = c.length;
+	var r = "";
+	for(var i=0; i<l; i++){
+		r += c[Math.floor(Math.random()*cl)];
+	}
+	var idInput = document.getElementById('txtbox1');
+	var h1 = document.getElementById("userCnt");
+	idInput.value = r;
+	var test = 0;
 	
+	//ソケット
 	var socket = io.connect();
+	socket.on("txtsend", function (data) { adm(data.value); });
+	socket.on("connected", function(name) {});
+	socket.on("disconnect", function () {});
+	socket.emit("connected", idInput.value);
 	
-	socket.on("txtsend", function (data) { addMessage(data.value); });
+	function cntDisplay(){
+	if(test == 0){
+		socket.on("countshow",function(data,fn){
+			h1.innerHTML = "";
+			h1.innerHTML = "現在の人数：" + data.value + "人";
+			test++;
+		});}else{
+		h1.innerHTML = "";
+		}
+		
+	}
 	
-	socket.on("from_server", function(data, fn){
-			var answer = console.log(data.value);
-			fn(answer);
-        });
+	//現在の人数を表示する。
+	cntDisplay();
 	
-	function publishMessage() {
-	  var idInput = document.getElementById('txtbox1');
-      var textInput = document.getElementById('txtbox2');
-      var msg = idInput.value + " : " + textInput.value;
-      socket.emit("txtsend", {value: msg});
-      textInput.value = '';
+	//メッセージを表示する
+	function pbm() {
+
+		var textInput = document.getElementById('txtbox2');
+		var msg = textInput.value + " : " + idInput.value;
+		socket.emit("txtsend", {value: msg});
+		textInput.value = '';
+		cntDisplay();
     }
 	
-	var msgArea = document.getElementById("msg");
-	function addMessage (msg) {
-      var domMeg = document.createElement('div');
-      domMeg.innerHTML = new Date().toLocaleTimeString() + ' ' + msg;
-      msgArea.appendChild(domMeg);
+	var msgput = document.getElementById("msg");
+	function adm (msg) {
+		var addmsg = document.createElement('div');
+		addmsg.innerHTML = new Date().toLocaleTimeString() + ' ' + msg;
+		msgput.appendChild(addmsg);
     }
 	
+
+
+	
+
 	/*
 	var cnt = 0;
 	function func() {

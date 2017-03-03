@@ -23,15 +23,37 @@ server.listen(port,function(){
 
 const socketio = require("socket.io");
 const io = socketio.listen(server);
-var cot = 0;
+var userHash = {};
+var cnt = 1;
 
 io.sockets.on('connection', function(socket) {
-  socket.emit("from_server", {value: 'hello'}, function (data) {
-    console.log("hey" + cot);
-	cot++;
+  socket.emit("countshow", {value: cnt}, function (data) {
   });
   
+  //メッセージを表示するソケット
   socket.on("txtsend", function (data) {
     io.sockets.emit("txtsend", {value:data.value});
   });
+  
+  //サーバーに現在の人数を表示させるソケット
+   socket.on("connected", function (name) {
+    userHash[socket.id] = name;
+	console.log("現在の人数：" + cnt + "人");
+	cnt++;
+  });
+  
+  socket.on("disconnect", function () {
+    if (userHash[socket.id]) {
+      delete userHash[socket.id];
+	  cnt--;
+	  console.log("現在の人数：" + cnt + "人");
+    }
+  });
+  
+  //クライアントに現在の人数を教える
+  /*
+  socket.on("countshow", function () {
+	  io.sockets.emit("countshow", {value:cnt});
+  });*/
+  
 });
